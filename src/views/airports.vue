@@ -211,8 +211,19 @@ export default {
                 console.error(exception);
             }
         },
-        async delete(){
-
+        async destroy(row){
+            try{
+                this.overlay = true;
+                let {data} = await this.$http.delete(`/airports/${row.id}`);
+                this.overlay = false;
+                if(!data.success){
+                    console.error("error");
+                    return;
+                }
+                this.load();
+            }catch(exception){
+                console.error(exception);
+            }
         }
     }
 
