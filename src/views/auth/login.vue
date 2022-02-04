@@ -8,12 +8,12 @@
                     </v-toolbar>
                     
                     <v-card-text>
-                        <v-form>
+                        <v-form ref="formLogin">
                             <v-text-field
                                 prepend-icon="mdi-account"
                                 v-model="email"
                                 label="Email"
-                                type="text"
+                                :rules="[$required, $email]"
                             ></v-text-field>
 
                             <v-text-field
@@ -21,6 +21,7 @@
                                 v-model="password"
                                 label="Password"
                                 type="password"
+                                :rules="[$required]"
                             ></v-text-field>
                         </v-form>
                     </v-card-text>
@@ -32,6 +33,10 @@
                 </v-card>
             </v-layout>
         </v-container>
+
+        <v-overlay :value="overlay" :z-index="9999">
+            <v-progress-circular indeterminate size="64"></v-progress-circular>
+        </v-overlay>
     </v-main>
 </template>
 
@@ -42,18 +47,30 @@
             return{
                 email:null,
                 password: null,
+                overlay: false,
             }
         }, methods: {
             async login(){
                 try{
-                    console.log("entre");
+                    let valid = this.$refs.formLogin.validate();
+                    if(!valid){
+                        return false
+                    }
+                    this.overlay = true;
                     let form = new FormData();
                     form.append('email', this.email);
                     form.append('password', this.password);
                     let {data} = await this.$http.post("/login", form);
-                    console.log(data);
+                    this.overlay = false;
+                    if(!data.success){
+                        console.log("error");
+                        return;
+                    }
+                    localStorage.setItem('token', `Bearer ${data.token}`);
+                    this.$router.push({name: 'admin'})
                 }catch(exception){
                     console.log(exception);
+                    this.overlay = false;
                 }
             }
         }

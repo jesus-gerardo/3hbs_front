@@ -1,7 +1,8 @@
 "use strict";
 
-import Vue from 'vue'
+import Vue from "vue";
 import axios from "axios";
+import router from "./../router/index";
 
 // Full config:  https://github.com/axios/axios#request-config
 // axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || '';
@@ -15,26 +16,29 @@ let config = {
 };
 
 const _axios = axios.create(config);
-
 _axios.interceptors.request.use(
   function(config) {
-    // Do something before request is sent
+    if(localStorage.getItem('token')){
+      config.headers['Authorization'] = localStorage.getItem('token');
+    }
     return config;
   },
   function(error) {
-    // Do something with request error
+    if(error.response.status == 401){
+      router.push({name:'login'});
+    }
     return Promise.reject(error);
   }
 );
 
-// Add a response interceptor
 _axios.interceptors.response.use(
   function(response) {
-    // Do something with response data
     return response;
   },
   function(error) {
-    // Do something with response error
+    if(error.response.status == 401){
+      router.push({name:'login'});
+    }
     return Promise.reject(error);
   }
 );

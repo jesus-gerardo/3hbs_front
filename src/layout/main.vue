@@ -2,6 +2,10 @@
     <v-app>
         <v-app-bar app dense>
             <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+            <v-spacer></v-spacer>
+            <v-btn icon @click="logout">
+                <v-icon>mdi-exit-to-app</v-icon>
+            </v-btn>
         </v-app-bar>
 
         <v-navigation-drawer app v-model="drawer" absolute bottom temporary>
@@ -55,6 +59,18 @@
         data (){
             return{
                 drawer: false,
+            }
+        }, methods:{
+            async logout(){
+                try{
+                    this.$router.push({name: 'login'});
+                    this.$http.get('/logout');
+                    localStorage.clear();
+                    
+                }catch(exception){
+                    // this.overlay = false;
+                    console.error(exception);
+                }
             }
         }
     }
